@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Disha Computer Institute – MCQ Exam</title>
+
+<style>
+    body { 
+        font-family: Arial, sans-serif; 
+        background: linear-gradient(to right, #e0f7fa, #80deea); 
+        padding:20px; 
+    }
+    #container { 
+        width:750px; margin:auto; background:white; padding:25px; border-radius:10px; 
+        box-shadow:0 0 15px rgba(0,0,0,0.2); 
+    }
+    h2, h3 { text-align:center; }
+    .input-box { margin:10px 0; }
+    input, select { padding:10px; width:95%; font-size:16px; margin-top:5px; }
+    button { padding:10px 25px; margin:10px 5px 0 0; border:none; border-radius:5px; font-size:16px; cursor:pointer; }
+    #startBtn { background:#0078d7; color:white; }
+    #submitBtn { background:#28a745; color:white; }
+    #prevBtn { background:#6c757d; color:white; }
+    #nextBtn { background:#17a2b8; color:white; }
+    #downloadCert { background:#ffc107; color:white; display:none; }
+    .question { padding:15px; background:#fafafa; margin-bottom:15px; border-left:5px solid #0078d7; display:none; }
+    #timer { font-size:22px; font-weight:bold; color:#d9534f; text-align:center; margin-bottom:20px; }
+    #result { font-size:20px; text-align:center; font-weight:bold; margin-top:20px; }
+</style>
+</head>
+<body>
+
+<div id="container">
+    <h2>Disha Computer Institute – Online MCQ Exam</h2>
+
+    <!-- FIRST ATTEMPT FORM -->
+    <div id="firstForm">
+        <h3>Enter Your Details</h3>
+        <div class="input-box">
+            <label>Enter Name:</label>
+            <input type="text" id="name1">
+        </div>
+        <div class="input-box">
+            <label>Enter Phone Number:</label>
+            <input type="text" id="phone1">
+        </div>
+        <div class="input-box">
+            <label>Select Exam:</label>
+            <select id="examSelect1">
+                <option value="">-- Select Exam --</option>
+                <option value="word">MS Word</option>
+                <option value="excel">MS Excel</option>
+                <option value="ppt">MS PowerPoint</option>
+            </select>
+        </div>
+        <button id="startBtn" onclick="startExam(1)">Start Exam</button>
+    </div>
+
+    <!-- SECOND ATTEMPT FORM -->
+    <div id="secondForm" style="display:none;">
+        <h3>Re-Attempt Exam</h3>
+        <div class="input-box">
+            <label>Enter Name:</label>
+            <input type="text" id="name2">
+        </div>
+        <div class="input-box">
+            <label>Enter Roll Number:</label>
+            <input type="text" id="roll2">
+        </div>
+        <div class="input-box">
+            <label>Select Exam:</label>
+            <select id="examSelect2">
+                <option value="">-- Select Exam --</option>
+                <option value="word">MS Word</option>
+                <option value="excel">MS Excel</option>
+                <option value="ppt">MS PowerPoint</option>
+            </select>
+        </div>
+        <button id="startBtn" onclick="startExam(2)">Start Exam</button>
+    </div>
+
+    <!-- TIMER -->
+    <div id="timer" style="display:none;">Time Left: <span id="time">15:00</span></div>
+
+    <!-- EXAM FORM -->
+    <form id="examForm" style="display:none;">
+        <h3>MCQ Exam</h3>
+        <div id="questions"></div>
+        <div style="text-align:right;">
+            <button type="button" id="prevBtn" onclick="prevQuestion()">Previous</button>
+            <button type="button" id="nextBtn" onclick="nextQuestion()">Next</button>
+            <button type="button" id="submitBtn" onclick="submitExam()">Submit Exam</button>
+        </div>
+    </form>
+
+    <div id="result"></div>
+    <button id="downloadCert" onclick="downloadCertificate()">Download Certificate</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+/* ---------------------------------------
+   HARD WORD QUESTIONS (20)
+-----------------------------------------*/
+const wordQuestions = [
+{question:"How to protect a Word document with a password?",a:"File→Info→Protect Document",b:"Review→Restrict Editing",c:"Home→Protect",d:"Insert→Password",correct:"a"},
+{question:"Shortcut for inserting a non-breaking space?",a:"Ctrl+Space",b:"Ctrl+Shift+Space",c:"Alt+Space",d:"Shift+Space",correct:"b"},
+{question:"Find & Replace using wildcards?",a:"Ctrl+H→More→Use Wildcards",b:"Ctrl+F→Advanced",c:"Ctrl+Shift+H",d:"Alt+F",correct:"a"},
+{question:"Creating a table of contents automatically?",a:"References→Table of Contents",b:"Insert→TOC",c:"View→References",d:"Home→Contents",correct:"a"},
+{question:"Cross-referencing figures/tables?",a:"References→Cross-reference",b:"Insert→Reference",c:"Layout→Cross",d:"Review→Reference",correct:"a"},
+{question:"Track Changes: accept all edits?",a:"Review→Accept→Accept All Changes",b:"File→Track Changes",c:"Home→Accept",d:"Layout→Changes",correct:"a"},
+{question:"Mail merge with custom fields?",a:"Mailings→Start Mail Merge",b:"Insert→Mail Merge",c:"Home→Merge",d:"Review→Mail Merge",correct:"a"},
+{question:"Linking text boxes across pages?",a:"Insert→Text Box→Link",b:"Layout→Link Boxes",c:"Home→Link Text",d:"View→Text Flow",correct:"a"},
+{question:"Inserting footnotes/endnotes?",a:"References→Insert Footnote/Endnote",b:"Insert→Footnote",c:"Home→References",d:"Layout→Insert Note",correct:"a"},
+{question:"Using Styles to format headings?",a:"Home→Styles",b:"Layout→Styles",c:"Insert→Styles",d:"Review→Format",correct:"a"},
+{question:"Creating a custom style set?",a:"Design→Styles→Save as New Style Set",b:"Home→Save Style",c:"Layout→Custom Styles",d:"Insert→Style Set",correct:"a"},
+{question:"Advanced find & replace formatting?",a:"Ctrl+H→Format→Choose Format",b:"Ctrl+F→Options",c:"Alt+H→Replace",d:"Shift+F→Format",correct:"a"},
+{question:"Insert equation using shortcut?",a:"Alt+= ",b:"Ctrl+E",c:"Shift+=",d:"Ctrl+Shift+E",correct:"a"},
+{question:"Creating bookmarks for quick navigation?",a:"Insert→Bookmark",b:"References→Bookmark",c:"View→Bookmark",d:"Home→Bookmark",correct:"b"},
+{question:"Updating a table of contents?",a:"References→Update Table",b:"Insert→Update TOC",c:"Home→Update Table",d:"Layout→Update",correct:"a"},
+{question:"Restrict editing for specific users?",a:"Review→Restrict Editing→Exceptions",b:"File→Protect Document",c:"Home→Restrict",d:"Insert→Secure",correct:"a"},
+{question:"Inserting a drop cap?",a:"Insert→Drop Cap",b:"Layout→Drop Cap",c:"Home→Drop Cap",d:"Review→Drop Cap",correct:"a"},
+{question:"Using Compare feature between documents?",a:"Review→Compare",b:"File→Compare",c:"Home→Compare",d:"Layout→Compare",correct:"a"},
+{question:"Creating multilevel numbered lists?",a:"Home→Multilevel List",b:"Layout→List",c:"Insert→Multilevel",d:"View→List",correct:"a"},
+{question:"Converting text to table?",a:"Insert→Table→Convert Text to Table",b:"Layout→Convert Table",c:"Home→Table→Convert",d:"References→Convert",correct:"a"}
+];
+
+/* ---------------------------------------
+   EXCEL QUESTIONS (20)
+-----------------------------------------*/
+const excelQuestions = [
+{question:"Formula starts with?",a:"#",b:"=",c:"+",d:"*",correct:"b"},
+{question:"SUM function?",a:"=ADD()",b:"=SUM()",c:"=PLUS()",d:"=TOTAL()",correct:"b"},
+{question:"MAX function returns?",a:"Minimum",b:"Average",c:"Largest value",d:"Sum",correct:"c"},
+{question:"MIN function returns?",a:"Smallest value",b:"Largest value",c:"Total",d:"Count",correct:"a"},
+{question:"Count text cells?",a:"=COUNT()",b:"=COUNTA()",c:"=COUNTBLANK()",d:"=COUNTIF()",correct:"b"},
+{question:"VLOOKUP usage?",a:"=VLOOKUP(value,range,col,FALSE)",b:"=LOOKUP()",c:"=MATCH()",d:"=INDEX()",correct:"a"},
+{question:"Protect sheet?",a:"Review→Protect Sheet",b:"Home→Protect",c:"File→Protect",d:"Data→Protect",correct:"a"},
+{question:"Freeze Panes?",a:"View→Freeze Panes",b:"Data→Freeze",c:"Layout→Freeze",d:"Home→Freeze",correct:"a"},
+{question:"Conditional formatting?",a:"Home→Conditional Formatting",b:"Data→Conditional",c:"Layout→Conditional",d:"Insert→Conditional",correct:"a"},
+{question:"Remove duplicates?",a:"Data→Remove Duplicates",b:"Home→Remove",c:"Layout→Remove",d:"Insert→Remove",correct:"a"},
+{question:"Shortcut to open workbook?",a:"Ctrl+O",b:"Ctrl+P",c:"Ctrl+S",d:"Ctrl+N",correct:"a"},
+{question:"Insert chart?",a:"Insert→Chart",b:"Home→Chart",c:"Layout→Chart",d:"Data→Chart",correct:"a"},
+{question:"Named ranges?",a:"Formulas→Name Manager",b:"Data→Name Manager",c:"Home→Name Manager",d:"Insert→Name Manager",correct:"a"},
+{question:"Transpose data?",a:"Copy→Paste Special→Transpose",b:"Copy→Paste→Transpose",c:"Data→Transpose",d:"Home→Transpose",correct:"a"},
+{question:"Split cells?",a:"Data→Text to Columns",b:"Home→Split",c:"Layout→Split",d:"Insert→Split",correct:"a"},
+{question:"Protect workbook?",a:"Review→Protect Workbook",b:"Home→Protect",c:"File→Protect",d:"Data→Protect",correct:"a"},
+{question:"Advanced filter?",a:"Data→Advanced",b:"Home→Advanced",c:"Layout→Advanced",d:"Insert→Advanced",correct:"a"},
+{question:"Pivot table creation?",a:"Insert→PivotTable",b:"Data→Pivot",c:"Home→Pivot",d:"Layout→Pivot",correct:"a"},
+{question:"Data validation setup?",a:"Data→Data Validation",b:"Home→Validate",c:"Layout→Validation",d:"Insert→Validate",correct:"a"},
+{question:"Trace dependents/precedents?",a:"Formulas→Trace",b:"Data→Trace",c:"Home→Trace",d:"Review→Trace",correct:"a"}
+];
+
+/* ---------------------------------------
+   POWERPOINT QUESTIONS (20)
+-----------------------------------------*/
+const pptQuestions = [
+{question:"Start slideshow?",a:"F5",b:"Shift+F5",c:"F2",d:"F3",correct:"a"},
+{question:"Duplicate slide?",a:"Ctrl+D",b:"Ctrl+C",c:"Ctrl+M",d:"Ctrl+R",correct:"a"},
+{question:"Insert shape?",a:"Insert→Shapes",b:"Home→Shapes",c:"Layout→Shapes",d:"View→Shapes",correct:"a"},
+{question:"Custom animation?",a:"Animations→Custom Animation",b:"Insert→Animation",c:"Home→Animation",d:"View→Animation",correct:"a"},
+{question:"Slide master?",a:"View→Slide Master",b:"Home→Master",c:"Insert→Master",d:"Layout→Master",correct:"a"},
+{question:"Add hyperlink?",a:"Insert→Hyperlink",b:"Ctrl+K",c:"Alt+K",d:"Shift+K",correct:"a"},
+{question:"Rehearse timings?",a:"Slide Show→Rehearse Timings",b:"View→Rehearse",c:"Insert→Rehearse",d:"Tools→Rehearse",correct:"a"},
+{question:"Slide layout?",a:"Home→Layout",b:"Insert→Layout",c:"View→Layout",d:"Design→Layout",correct:"a"},
+{question:"Slide transition?",a:"Animations→Transition",b:"Design→Transition",c:"View→Transition",d:"Insert→Transition",correct:"a"},
+{question:"Slide show shortcut?",a:"F5",b:"Shift+F5",c:"F2",d:"F3",correct:"a"},
+{question:"Insert video/audio?",a:"Insert→Media",b:"Home→Media",c:"Layout→Media",d:"Design→Media",correct:"a"},
+{question:"Format background?",a:"Design→Format Background",b:"Layout→Background",c:"View→Background",d:"Home→Background",correct:"a"},
+{question:"Set slide size?",a:"Design→Slide Size",b:"Layout→Slide Size",c:"View→Slide Size",d:"Home→Slide Size",correct:"a"},
+{question:"Hide slide?",a:"Slide Show→Hide Slide",b:"Home→Hide",c:"Insert→Hide",d:"Layout→Hide",correct:"a"},
+{question:"Section creation?",a:"Home→Section→Add Section",b:"Insert→Section",c:"Design→Section",d:"View→Section",correct:"a"},
+{question:"Reset slide layout?",a:"Home→Reset",b:"Design→Reset",c:"Insert→Reset",d:"Layout→Reset",correct:"a"},
+{question:"Apply template/theme?",a:"Design→Themes",b:"Home→Themes",c:"Insert→Themes",d:"View→Themes",correct:"a"},
+{question:"Use Slide Sorter view?",a:"View→Slide Sorter",b:"Home→Sorter",c:"Design→Sorter",d:"Insert→Sorter",correct:"a"},
+{question:"Set custom shows?",a:"Slide Show→Custom Shows",b:"Insert→Custom",c:"Design→Custom",d:"View→Custom",correct:"a"},
+{question:"Add notes?",a:"View→Notes Page",b:"Home→Notes",c:"Insert→Notes",d:"Design→Notes",correct:"a"}
+];
+
+/* ---------------------------------------
+   VARIABLES & FUNCTIONS (unchanged)
+-----------------------------------------*/
+let attempt=1, selectedExam="", quizData=[], timerInterval, timeLeft=15*60; 
+let currentQ=0;
+
+function startExam(num){
+    attempt=num;
+    let name, roll, exam;
+    if(num===1){ name=document.getElementById("name1").value; roll=document.getElementById("phone1").value; exam=document.getElementById("examSelect1").value; } 
+    else { name=document.getElementById("name2").value; roll=document.getElementById("roll2").value; exam=document.getElementById("examSelect2").value; }
+    if(!name || !roll || !exam){ alert("Please fill all details!"); return; }
+    selectedExam=exam;
+    quizData=(exam==="word"?wordQuestions:(exam==="excel"?excelQuestions:pptQuestions));
+    document.getElementById("firstForm").style.display="none";
+    document.getElementById("secondForm").style.display="none";
+    document.getElementById("examForm").style.display="block";
+    document.getElementById("timer").style.display="block";
+    loadQuestions();
+    showQuestion(0);
+    startTimer();
+}
+
+function loadQuestions(){
+    let html="";
+    quizData.forEach((q,index)=>{
+        html+=`<div class="question" id="q${index}">
+            <b>${index+1}. ${q.question}</b><br><br>
+            <input type="radio" name="q${index}" value="a"> ${q.a}<br>
+            <input type="radio" name="q${index}" value="b"> ${q.b}<br>
+            <input type="radio" name="q${index}" value="c"> ${q.c}<br>
+            <input type="radio" name="q${index}" value="d"> ${q.d}<br>
+        </div>`;
+    });
+    document.getElementById("questions").innerHTML=html;
+}
+
+function showQuestion(n){
+    quizData.forEach((_,i)=>{ document.getElementById("q"+i).style.display=(i===n?"block":"none"); });
+    currentQ=n;
+}
+function nextQuestion(){ if(currentQ<quizData.length-1) showQuestion(currentQ+1); }
+function prevQuestion(){ if(currentQ>0) showQuestion(currentQ-1); }
+
+function startTimer(){
+    document.getElementById("time").textContent=formatTime(timeLeft);
+    timerInterval=setInterval(()=>{
+        timeLeft--;
+        document.getElementById("time").textContent=formatTime(timeLeft);
+        if(timeLeft<=0){ clearInterval(timerInterval); alert("Time's up! Auto-submitting exam."); submitExam(); }
+    },1000);
+}
+function formatTime(sec){
+    let m=Math.floor(sec/60), s=sec%60;
+    return (m<10?"0":"")+m+":"+(s<10?"0":"")+s;
+}
+
+function submitExam(){
+    clearInterval(timerInterval);
+    let score=0;
+    quizData.forEach((q,index)=>{
+        let ans=document.querySelector('input[name="q'+index+'"]:checked');
+        if(ans && ans.value===q.correct) score+=5;
+    });
+    document.getElementById("examForm").style.display="none";
+    document.getElementById("timer").style.display="none";
+    document.getElementById("result").innerHTML=`${attempt===1?"Your Score:":"Re-Attempt Score:"} ${score} / ${quizData.length*5}`;
+    document.getElementById("downloadCert").style.display="inline-block";
+}
+
+function downloadCertificate(){
+    const { jsPDF } = window.jspdf;
+    let doc = new jsPDF();
+    let name=(attempt===1?document.getElementById("name1").value:document.getElementById("name2").value);
+    let scoreText=document.getElementById("result").textContent;
+    doc.setFontSize(22);
+    doc.text("Disha Computer Institute", 20, 30);
+    doc.setFontSize(16);
+    doc.text("Certificate of Completion", 20, 50);
+    doc.text(`Name: ${name}`, 20, 70);
+    doc.text(`${scoreText}`, 20, 90);
+    doc.save("Certificate.pdf");
+}
+</script>
+
+</body>
+</html>
